@@ -14,24 +14,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RoleUser {
+  ADMIN @map("administrator")
+  USER  @map("user")
+}
+
 model User {
-  id                        Int       @default(autoincrement()) @id
-  username                  String    @unique
-  email                     String    @unique
-  emailVerified             Boolean   @default(false) @map("email_verified")
-  failedAttempts            Int       @default(0) @map("failed_attempts")
-  lockoutUntil              DateTime? @map("lock_out_until")
+  id                        Int         @default(autoincrement()) @id
+  username                  String                                                                          @unique
+  email                     String                                                                          @unique
+  emailVerified             Boolean     @default(false)                 @map("email_verified")
+  failedAttempts            Int         @default(0)                     @map("failed_attempts")
+  lockoutUntil              DateTime?                                   @map("lock_out_until")
   password                  String
-  resetPasswordToken        String?   @unique
-  resetPasswordTokenExpiry  DateTime?
-  role                      Role      @default(USER)
-  twoFactorSecret           String?   @map("two_factor_secret")
-  verificationToken         String?   @map("verification_token") @unique
+  resetPasswordToken        String?                                     @map("reset_password_token")        @unique
+  resetPasswordTokenExpiry  DateTime?                                   @map("reset_password_token_expiry") @unique
+  role                      RoleUser    @default(USER)
+  twoFactorSecret           String?                                     @map("two_factor_secret")
+  verificationToken         String?                                     @map("verification_token")          @unique
+  createdAt                 DateTime    @default(now())                 @map("created_at")
+  updatedAt                 DateTime                                    @map("updated_at")                              @updatedAt
+
+  address                   Address?
 
   @@map("users")
 }
 
-enum Role {
-  ADMIN @map("administrator")
-  USER  @map("user")
+model Address {
+  id                        Int       @default(autoincrement()) @id
+  street                    String?
+  city                      String?
+  province                  String
+  country                   String
+  postal_code               String
+
+  user                      User     @relation(fields: [userId], references: [id])
+  userId                    Int                                                                            @unique
 }
