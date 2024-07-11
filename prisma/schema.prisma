@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// https://pris.ly/d/prisma-schema
+// https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -10,44 +7,74 @@ generator client {
 
 datasource db {
   directUrl = env("DIRECT_URL")
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
 }
 
 enum RoleUser {
   ADMIN @map("administrator")
   USER  @map("user")
+
+  @@map("role_user")
 }
 
-model User {
-  id                        Int         @default(autoincrement()) @id
-  username                  String                                                                          @unique
-  email                     String                                                                          @unique
-  emailVerified             Boolean     @default(false)                 @map("email_verified")
-  failedAttempts            Int         @default(0)                     @map("failed_attempts")
-  lockoutUntil              DateTime?                                   @map("lock_out_until")
-  password                  String
-  resetPasswordToken        String?                                     @map("reset_password_token")        @unique
-  resetPasswordTokenExpiry  DateTime?                                   @map("reset_password_token_expiry") @unique
-  role                      RoleUser    @default(USER)
-  twoFactorSecret           String?                                     @map("two_factor_secret")
-  verificationToken         String?                                     @map("verification_token")          @unique
-  createdAt                 DateTime    @default(now())                 @map("created_at")
-  updatedAt                 DateTime                                    @map("updated_at")                              @updatedAt
+enum TypeToken {
+  ACCESS         @map("access")
+  REFRESH        @map("refresh")
+  RESET_PASSWORD @map("reset_password")
+  VERIFY_EMAIL   @map("verify_email")
 
-  address                   Address?
+  @@map("type_token")
+}
 
-  @@map("users")
+model Token {
+  id          Int       @id @default(autoincrement())
+  token       String    @unique
+  type        TypeToken
+  expires     DateTime
+  blacklisted Boolean
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  @@map("token")
 }
 
 model Address {
-  id                        Int       @default(autoincrement()) @id
-  street                    String?
-  city                      String?
-  province                  String
-  country                   String
-  postal_code               String
+  id         Int     @id @default(autoincrement())
+  street     String?
+  city       String?
+  province   String
+  country    String
+  postalCode String  @map("postal_code")
 
-  user                      User     @relation(fields: [userId], references: [id])
-  userId                    Int                                                                            @unique
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+
+  @@map("address")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique
+  email         String   @unique
+  emailVerified Boolean  @default(false) @map("email_verified")
+  password      String
+  role          RoleUser @default(USER)
+
+  failedAttempts Int       @default(0) @map("failed_attempts")
+  lockoutUntil   DateTime? @map("lock_out_until")
+
+  twoFactorSecret String? @map("two_factor_secret")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  address Address?
+  tokens  Token[]
+
+  @@map("users")
 }

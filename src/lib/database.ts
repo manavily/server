@@ -1,12 +1,12 @@
-import { PrismaClient } from "@prisma/client";
+import {PrismaClient} from "@prisma/client";
 import logger from "./logger";
 
 const database = new PrismaClient({
   log: [
-    { emit: "event", level: "error" },
-    { emit: "event", level: "info" },
-    { emit: "event", level: "query" },
-    { emit: "event", level: "warn" },
+    {emit: "event", level: "error"},
+    {emit: "event", level: "info"},
+    {emit: "event", level: "query"},
+    {emit: "event", level: "warn"},
   ],
 });
 

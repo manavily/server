@@ -1,6 +1,6 @@
-import type { NextFunction, Request, Response } from "express";
-import type { JwtPayload } from "jsonwebtoken";
-import { verifyToken } from "../lib/token";
+import type {NextFunction, Request, Response} from "express";
+import type {JwtPayload} from "jsonwebtoken";
+import {verifyToken} from "../lib/token";
 import ResponseError from "../utils/response-error";
 
 export default function (req: Request, res: Response, next: NextFunction) {
@@ -12,6 +12,6 @@ export default function (req: Request, res: Response, next: NextFunction) {
   if (!payload) {
     throw new ResponseError(401, "Invalid access token");
   }
-  (req as Request & { user: string | JwtPayload }).user = payload;
+  (req as Request & {user: string | JwtPayload}).user = payload;
   next();
 }

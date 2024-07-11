@@ -1,11 +1,11 @@
-import { Router } from "express";
+import {Router} from "express";
 import authController from "../controllers/auth";
 import authenticate from "../middleware/authenticate";
 import rateLimiter from "../middleware/rate-limiter";
 
 const route = Router();
 
-route.get("/verify-email", authenticate, authController.verifyEmail);
+route.get("/verify-email", authController.verifyEmail);
 route.post("/refresh-token", authenticate, authController.refreshToken);
 route.post("/reset-password", authController.resetPassword);
 route.post("/reset-password-request", authController.resetPasswordRequest);
